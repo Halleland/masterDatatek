@@ -16,14 +16,14 @@ class MultimodalModel:
                 clusterer = None, num_terms = 10,
                 
                 precomputed_text_embeds = None, precomputed_image_embeds =None,
-                compute_embeddings=False):
+                compute_embeddings=False, combined_embed = None):
         self.df = pd.read_table(path_to_data)
         self.texts, self.images = multimodal.get_image_and_text_from_file(path_to_data)
         self.embedding_model = embedding_model
         self.text_embeds = precomputed_text_embeds
         self.image_embeds = precomputed_image_embeds
-        self.combined_embed = None
-        if self.text_embeds is not None and self.image_embeds is not None:
+        self.combined_embed = combined_embed
+        if self.text_embeds is not None and self.image_embeds is not None and self.combined_embed is None:
             self.combine_embeds()
 
         if compute_embeddings:
