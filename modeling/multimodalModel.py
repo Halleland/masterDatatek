@@ -4,6 +4,7 @@ import image_exemplars
 
 import umap
 import hdbscan
+from hdbscan.flat import HDBSCAN_flat
 import pandas as pd
 
 # Plotting and visuals
@@ -16,7 +17,7 @@ class MultimodalModel:
                 clusterer = None, num_terms = 10,
                 
                 precomputed_text_embeds = None, precomputed_image_embeds =None,
-                compute_embeddings=False, combined_embed = None):
+                compute_embeddings=False, combined_embed = None, n_clusters=None):
         self.df = pd.read_table(path_to_data)
         self.texts, self.images = multimodal.get_image_and_text_from_file(path_to_data)
         self.embedding_model = embedding_model
@@ -39,6 +40,8 @@ class MultimodalModel:
 
         self.umap_embedding = None
 
+        self.n_clusters = n_clusters
+        self.flat_clusterer = None
 
         # For info
         self.tf_idf = None
@@ -68,12 +71,17 @@ class MultimodalModel:
     def fit(self):
         self.umap_embedding = self.umap_model.fit_transform(self.combined_embed)
         self.clusterer.fit(self.umap_embedding)
+        if self.n_clusters is not None:
+            self.flat_clusterer = HDBSCAN_flat(self.umap_embedding, clusterer=self.clusterer, n_clusters=self.n_clusters)
+
+
 
     def compute_c_tf_idf(self):
         """
         Requires fit umap
         """
-        self.tf_idf, self.classes = c_tf_idf.find_c_tf_idf_from_hdbscan_model(self.df, self.clusterer)
+        labels = self.flat_clusterer.labels_ if self.n_clusters is not None else self.clusterer.labels_
+        self.tf_idf, self.classes = c_tf_idf.find_c_tf_idf_from_hdbscan_model(self.df, labels)
         self.top_terms = c_tf_idf.get_top_terms(self.tf_idf, self.classes, self.num_terms)
     
     def fit_transform(self):
@@ -81,7 +89,8 @@ class MultimodalModel:
             self.compute_embeddings()
         self.fit()
         self.compute_c_tf_idf()
-        return self.clusterer.labels_
+        labels = self.flat_clusterer.labels_ if self.n_clusters is not None else self.clusterer.labels_
+        return labels
     
     def get_topic(self, i):
         return self.top_terms[i]
@@ -90,7 +99,13 @@ class MultimodalModel:
         """
         Requires trained clusterer
         """
-        self.cluster_images = image_exemplars.find_image_represenation_of_clusters(self.clusterer, self.image_embeds, self.images)
+        n_clusters_in_use =  self.n_clusters is not None
+        if n_clusters_in_use:
+            labels = self.flat_clusterer.labels_
+            self.cluster_images = image_exemplars.find_image_represenation_of_clusters(self.flat_clusterer, labels, self.image_embeds, self.images, n_clusters_in_use = n_clusters_in_use)
+        else:
+            labels = self.clusterer.labels_
+            self.cluster_images = image_exemplars.find_image_represenation_of_clusters(self.clusterer, labels, self.image_embeds, self.images)
 
     def plot_images(self):
         """

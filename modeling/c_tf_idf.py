@@ -1,7 +1,6 @@
 import re
 import nltk
 import numpy as np
-import hdbscan
 from tqdm.auto import tqdm
 
 def get_tokens_for_docs(docs):
@@ -32,9 +31,9 @@ def find_vocab(classes):
         classes[c]['vocab'] = set(classes[c]['tokens'])
     return vocab
 
-def find_c_tf_idf_from_hdbscan_model(df, clusterer:hdbscan.HDBSCAN):
+def find_c_tf_idf_from_hdbscan_model(df, labels):
     classes = {}
-    for label in set(clusterer.labels_):
+    for label in set(labels):
         classes[label] = {
             'vocab': set(),
             'tokens': [],
@@ -42,7 +41,7 @@ def find_c_tf_idf_from_hdbscan_model(df, clusterer:hdbscan.HDBSCAN):
         }
 
     docs = df['context_page_description'].to_frame()
-    docs['class'] = clusterer.labels_
+    docs['class'] = labels
 
     docs['tokens'] = get_tokens_for_docs(docs)
     docs.apply(lambda row:
