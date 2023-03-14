@@ -3,6 +3,7 @@
 data/raw
 utforsking
 data/clean/main_image_en_wit_v1_train_0_of_10.tsv
+experiments/multimodal_data.tsv
 # automatic
 
 # Byte-compiled / optimized / DLL files
