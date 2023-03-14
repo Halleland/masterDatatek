@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 import pandas as pd
 
@@ -19,19 +19,19 @@ def load_all_data(paths):
 
 def run_experiment(trainer, output_folder, name, num_times=3):
     exp_start = datetime.now().strftime('%d%m%Y_%H_%M_%S')
-    print(exp_start)
+    print(f'start:{exp_start}')
     outputs = []
     results = []
     for i in range(num_times):
         out = trainer.train(trainer.params)
         res = trainer.evaluate(out)
         results.append(res)
-        outputs.append({'topics':outputs})
+        outputs.append({'topics':out})
     df_res = pd.DataFrame.from_records(results)
-    df_out = pd.DataFrame.from_records(outputs)
+    df_out = pd.DataFrame(outputs)
     
-    df_res.to_csv(f'{name}_metrics_{exp_start}')
-    df_out.to_csv(f'{name}_topics_{exp_start}')
+    df_res.to_csv(f'{output_folder}/{name}_metrics_{exp_start}.csv')
+    df_out.to_csv(f'{output_folder}/{name}_topics_{exp_start}.csv')
 
     exp_end = datetime.now().strftime('%d%m%Y_%H_%M_%S')
-    print(exp_end)
+    print(f'end:{exp_start}')

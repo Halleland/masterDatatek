@@ -75,7 +75,7 @@ class LDATrainer(Trainer):
         self.num_topics = num_topics
 
     def train(self, params):
-        self.model = LDA(num_topics=10)
+        self.model = LDA(num_topics=self.num_topics)
         out = self.model.train_model(self.data)
         return out
 
