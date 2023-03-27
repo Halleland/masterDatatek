@@ -44,4 +44,4 @@ def run_experiment(trainer, output_folder, name, num_times=3):
     df_out.to_csv(f'{output_folder}/{name}_topics_{exp_start}.csv')
 
     exp_end = datetime.now().strftime('%d%m%Y_%H_%M_%S')
-    print(f'end:{exp_start}')
+    print(f'end:{exp_end}')

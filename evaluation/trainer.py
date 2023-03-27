@@ -27,8 +27,9 @@ class Trainer:
         all_words = [word.lower() for words in self.data.get_corpus() for word in words]
         bertopic_topics = [
             [
-                vals if vals in all_words else all_words[0]
+                vals.lower() 
                 for vals in self.model.get_topic(i)
+                if vals.lower() in all_words
             ]
             for i in range(len(set(topics)) - 1)
         ]
@@ -58,15 +59,15 @@ class Trainer:
         if self.metrics_loader:
             metrics = self.metrics_loader.get_metrics()
         else:
-            npmi = Coherence(texts = self.data.get_corpus(), topk=self.top_k, measure="c_npmi")
+            #npmi = Coherence(texts = self.data.get_corpus(), topk=self.top_k, measure="c_npmi")
             topic_diversity = TopicDiversity(topk=self.top_k)
             wetc = WECoherenceCentroid(topk=self.top_k)
 
-            coherence= [(npmi, "npmi")]
+            #coherence= [(npmi, "npmi")]
             coherence2 = [(wetc, 'wetc')]
             diversity = [(topic_diversity, "diversity")]
 
-            metrics = [(coherence, "Coherence"), (diversity, "Diversity"), (coherence2, "WE Coherence")]
+            metrics = [ (diversity, "Diversity"), (coherence2, "WE Coherence")]#,(coherence, "Coherence")
         return metrics
 
 class LDATrainer(Trainer):
@@ -92,15 +93,15 @@ class MetricsLoader:
         return data
     
     def set_metrics(self):
-        npmi = Coherence(texts = self.data.get_corpus(), topk=self.top_k, measure="c_npmi")
+        #npmi = Coherence(texts = self.data.get_corpus(), topk=self.top_k, measure="c_npmi")
         topic_diversity = TopicDiversity(topk=self.top_k)
         wetc = WECoherenceCentroid(topk=self.top_k)
 
-        coherence= [(npmi, "npmi")]
+        #coherence= [(npmi, "npmi")]
         coherence2 = [(wetc, 'wetc')]
         diversity = [(topic_diversity, "diversity")]
 
-        metrics = [(coherence, "Coherence"), (diversity, "Diversity"), (coherence2, "WE Coherence")]
+        metrics = [(diversity, "Diversity"), (coherence2, "WE Coherence")]#(coherence, "Coherence")
         return metrics
 
     def get_metrics(self):

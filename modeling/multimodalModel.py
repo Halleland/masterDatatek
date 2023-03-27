@@ -14,7 +14,7 @@ import plotly.express as px
 
 class MultimodalModel:
     def __init__(self, path_to_data, embedding_model, umap_model = None,
-                clusterer = None, num_terms = 10,
+                clusterer = None, num_terms = 12,
                 
                 precomputed_text_embeds = None, precomputed_image_embeds =None,
                 compute_embeddings=False, combined_embed = None, n_clusters=None):
@@ -95,7 +95,8 @@ class MultimodalModel:
     def get_topic(self, i):
         return self.top_terms[i]
 
-    def find_image_represenatives(self):
+
+    def find_image_representatives(self):
         """
         Requires trained clusterer
         """

@@ -130,3 +130,7 @@ def find_image_represenation_of_clusters(clusterer:hdbscan.HDBSCAN, labels, imag
                                                     cluster_embeddings, labels)
     cluster_images = _cluster_representation(image_list, selected_exemplars, labels)
     return cluster_images
+
+def find_text_representation_of_clusters(clusterer, labels, n_clusters_in_use=False):
+    exemplars = _extract_exemplars(clusterer, labels, n_clusters_in_use)
+    pass
